@@ -16,9 +16,27 @@ public class HelloController {
         return "Hello " + name;
     }
 
+//    @GetMapping("/greet")
+//    public String helloWithParam(@RequestParam String name) {
+//        return "Hello " + name;
+//    }
+
+//    @GetMapping("/greet")
+//    public String greetWithParam(
+//            @RequestParam(required = false) String name
+//    ) {
+//        if (name == null) {
+//            return "Hello!";
+//        }
+//        return "Hello " + name;
+//    }
+
     @GetMapping("/greet")
-    public String helloWithParam(@RequestParam String name) {
+    public String greetWithParam(
+            @RequestParam(defaultValue = "user") String name
+    ) {
         return "Hello " + name;
     }
+
 
 }
