@@ -1,4 +1,4 @@
-package com.omar.demo_api;
+package com.omar.demoapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

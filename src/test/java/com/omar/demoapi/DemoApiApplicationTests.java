@@ -1,4 +1,4 @@
-package com.omar.demo_api;
+package com.omar.demoapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
