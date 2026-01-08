@@ -1,5 +1,6 @@
 package com.omar.demoapi.service;
 
+import com.omar.demoapi.dto.UserRequest;
 import com.omar.demoapi.entity.User;
 import com.omar.demoapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,12 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public User createUser(User user) {
+    public User createUser(UserRequest userRequest) {
+        User user = new User();
+        user.setName(userRequest.getName());
+        user.setEmail(userRequest.getEmail());
+        user.setPassword(userRequest.getPassword());
+
         return userRepository.save(user);
     }
 

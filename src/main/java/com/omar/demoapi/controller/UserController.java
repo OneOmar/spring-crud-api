@@ -1,11 +1,10 @@
 package com.omar.demoapi.controller;
 
+import com.omar.demoapi.dto.UserRequest;
 import com.omar.demoapi.entity.User;
 import com.omar.demoapi.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,5 +21,11 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @PostMapping
+    public ResponseEntity<User> createUser(@RequestBody UserRequest userRequest) {
+        User createdUser = userService.createUser(userRequest);
+        return ResponseEntity.status(201).body(createdUser);
     }
 }
