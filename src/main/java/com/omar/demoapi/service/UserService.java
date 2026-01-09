@@ -2,6 +2,7 @@ package com.omar.demoapi.service;
 
 import com.omar.demoapi.dto.UserRequest;
 import com.omar.demoapi.entity.User;
+import com.omar.demoapi.exception.UserNotFoundException;
 import com.omar.demoapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +22,9 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     public User createUser(UserRequest userRequest) {
@@ -50,6 +52,9 @@ public class UserService {
     }
 
     public void deleteUser(Long id) {
+        userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
         userRepository.deleteById(id);
     }
 }

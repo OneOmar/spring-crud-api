@@ -27,15 +27,8 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserBuId(@PathVariable Long id) {
-        Optional<User> user = userService.getUserById(id);
-
-        if(user.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(user.get());
-        // functional style
-        // return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        User user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping
@@ -58,16 +51,8 @@ public class UserController {
         return ResponseEntity.ok(updateUser.get());
     }
 
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-
-        Optional<User> user = userService.getUserById(id);
-
-        if(user.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
