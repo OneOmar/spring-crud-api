@@ -3,6 +3,7 @@ package com.omar.demoapi.controller;
 import com.omar.demoapi.dto.UserRequest;
 import com.omar.demoapi.entity.User;
 import com.omar.demoapi.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +39,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<User> createUser(@Valid @RequestBody UserRequest userRequest) {
         User createdUser = userService.createUser(userRequest);
         return ResponseEntity.status(201).body(createdUser);
     }
@@ -46,7 +47,7 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(
             @PathVariable Long id,
-            @RequestBody UserRequest userRequest
+            @Valid @RequestBody UserRequest userRequest
     ) {
         Optional<User> updateUser = userService.updateUser(id, userRequest);
 
