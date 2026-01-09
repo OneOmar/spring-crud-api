@@ -36,19 +36,17 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Optional<User> updateUser(Long id, UserRequest request) {
+    public User updateUser(Long id, UserRequest request) {
 
-        Optional<User> existingUser = userRepository.findById(id);
+        User user = userRepository.findById(id).
+                orElseThrow(() -> new UserNotFoundException(id));
 
-        if (existingUser.isEmpty()) { return Optional.empty();}
 
-        User user = existingUser.get();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
 
-        userRepository.save(user);
-        return Optional.of(user);
+        return userRepository.save(user);
     }
 
     public void deleteUser(Long id) {

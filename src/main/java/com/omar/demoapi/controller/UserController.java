@@ -42,13 +42,9 @@ public class UserController {
             @PathVariable Long id,
             @Valid @RequestBody UserRequest userRequest
     ) {
-        Optional<User> updateUser = userService.updateUser(id, userRequest);
 
-        if(updateUser.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(updateUser.get());
+        User updateUser = userService.updateUser(id, userRequest);
+        return ResponseEntity.ok(updateUser);
     }
 
     @DeleteMapping("/{id}")
