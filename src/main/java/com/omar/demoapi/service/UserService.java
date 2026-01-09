@@ -1,8 +1,10 @@
 package com.omar.demoapi.service;
 
 import com.omar.demoapi.dto.UserRequest;
+import com.omar.demoapi.dto.UserResponse;
 import com.omar.demoapi.entity.User;
 import com.omar.demoapi.exception.UserNotFoundException;
+import com.omar.demoapi.mapper.UserMapper;
 import com.omar.demoapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,30 +15,36 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+
+    public List<UserResponse> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(userMapper::toResponse)
+                .toList();
     }
 
-    public User getUserById(Long id) {
-        return userRepository.findById(id)
+    public UserResponse getUserById(Long id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
+
+        return userMapper.toResponse(user);
     }
 
-    public User createUser(UserRequest userRequest) {
-        User user = new User();
-        user.setName(userRequest.getName());
-        user.setEmail(userRequest.getEmail());
-        user.setPassword(userRequest.getPassword());
+    public UserResponse createUser(UserRequest userRequest) {
+        User user = userMapper.toEntity(userRequest);
+        User savedUser = userRepository.save(user);
 
-        return userRepository.save(user);
+        return userMapper.toResponse(savedUser);
     }
 
-    public User updateUser(Long id, UserRequest request) {
+    public UserResponse updateUser(Long id, UserRequest request) {
 
         User user = userRepository.findById(id).
                 orElseThrow(() -> new UserNotFoundException(id));
@@ -46,7 +54,8 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
 
-        return userRepository.save(user);
+        User updatedUser = userRepository.save(user);
+        return userMapper.toResponse(updatedUser);
     }
 
     public void deleteUser(Long id) {

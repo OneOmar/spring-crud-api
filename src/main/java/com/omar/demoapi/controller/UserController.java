@@ -1,6 +1,7 @@
 package com.omar.demoapi.controller;
 
 import com.omar.demoapi.dto.UserRequest;
+import com.omar.demoapi.dto.UserResponse;
 import com.omar.demoapi.entity.User;
 import com.omar.demoapi.service.UserService;
 import jakarta.validation.Valid;
@@ -21,30 +22,31 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
+        List<UserResponse> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserBuId(@PathVariable Long id) {
-        User user = userService.getUserById(id);
+    public ResponseEntity<UserResponse> getUserBuId(@PathVariable Long id) {
+        UserResponse user = userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@Valid @RequestBody UserRequest userRequest) {
-        User createdUser = userService.createUser(userRequest);
-        return ResponseEntity.status(201).body(createdUser);
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest userRequest) {
+        UserResponse newUser = userService.createUser(userRequest);
+        return ResponseEntity.status(201).body(newUser);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(
+    public ResponseEntity<UserResponse> updateUser(
             @PathVariable Long id,
             @Valid @RequestBody UserRequest userRequest
     ) {
 
-        User updateUser = userService.updateUser(id, userRequest);
-        return ResponseEntity.ok(updateUser);
+        UserResponse updatedUser = userService.updateUser(id, userRequest);
+        return ResponseEntity.ok(updatedUser);
     }
 
     @DeleteMapping("/{id}")
