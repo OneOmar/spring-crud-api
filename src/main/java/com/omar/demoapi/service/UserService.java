@@ -1,9 +1,11 @@
 package com.omar.demoapi.service;
 
+import com.omar.demoapi.dto.LoginRequest;
 import com.omar.demoapi.dto.UserPatchRequest;
 import com.omar.demoapi.dto.UserRequest;
 import com.omar.demoapi.dto.UserResponse;
 import com.omar.demoapi.entity.User;
+import com.omar.demoapi.exception.AuthenticationFailedException;
 import com.omar.demoapi.exception.UserNotFoundException;
 import com.omar.demoapi.mapper.UserMapper;
 import com.omar.demoapi.repository.UserRepository;
@@ -92,5 +94,22 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(id));
 
         userRepository.deleteById(id);
+    }
+
+    // Authentication method
+    public void login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(AuthenticationFailedException::new);
+
+        boolean passwordMatches = passwordEncoder.matches(
+                request.getPassword(),
+                user.getPassword()
+        );
+
+        if (!passwordMatches) {
+            throw new AuthenticationFailedException();
+        }
+
+        // Authentication successful
     }
 }
