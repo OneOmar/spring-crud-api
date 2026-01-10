@@ -1,5 +1,6 @@
 package com.omar.demoapi.controller;
 
+import com.omar.demoapi.dto.UserPatchRequest;
 import com.omar.demoapi.dto.UserRequest;
 import com.omar.demoapi.dto.UserResponse;
 import com.omar.demoapi.entity.User;
@@ -48,6 +49,17 @@ public class UserController {
         UserResponse updatedUser = userService.updateUser(id, userRequest);
         return ResponseEntity.ok(updatedUser);
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<UserResponse> patchUser(
+            @PathVariable Long id,
+            @Valid @RequestBody UserPatchRequest request
+            ) {
+
+        UserResponse patchedUser = userService.patchUser(id, request);
+        return ResponseEntity.ok(patchedUser);
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {

@@ -1,5 +1,6 @@
 package com.omar.demoapi.service;
 
+import com.omar.demoapi.dto.UserPatchRequest;
 import com.omar.demoapi.dto.UserRequest;
 import com.omar.demoapi.dto.UserResponse;
 import com.omar.demoapi.entity.User;
@@ -65,6 +66,25 @@ public class UserService {
 
         User updatedUser = userRepository.save(user);
         return userMapper.toResponse(updatedUser);
+    }
+
+    public UserResponse patchUser(Long id, UserPatchRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        if (request.getName() != null) {
+            user.setName(request.getName());
+        }
+        if (request.getEmail() != null) {
+            user.setEmail(request.getEmail());
+        }
+        if (request.getPassword() != null) {
+            String hashedPassword = passwordEncoder.encode(request.getPassword());
+            user.setPassword(hashedPassword);
+        }
+
+        User patchedUser = userRepository.save(user);
+        return userMapper.toResponse(patchedUser);
     }
 
     public void deleteUser(Long id) {
