@@ -6,20 +6,22 @@ import com.omar.demoapi.entity.User;
 import com.omar.demoapi.exception.UserNotFoundException;
 import com.omar.demoapi.mapper.UserMapper;
 import com.omar.demoapi.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -39,8 +41,11 @@ public class UserService {
 
     public UserResponse createUser(UserRequest userRequest) {
         User user = userMapper.toEntity(userRequest);
-        User savedUser = userRepository.save(user);
 
+        String hashedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(hashedPassword);
+
+        User savedUser = userRepository.save(user);
         return userMapper.toResponse(savedUser);
     }
 
@@ -52,7 +57,9 @@ public class UserService {
 
         user.setName(request.getName());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+
+        String hashedPassword = passwordEncoder.encode(request.getPassword());
+        user.setPassword(hashedPassword);
 
         User updatedUser = userRepository.save(user);
         return userMapper.toResponse(updatedUser);
