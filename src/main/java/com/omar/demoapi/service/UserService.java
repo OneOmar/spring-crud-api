@@ -6,6 +6,7 @@ import com.omar.demoapi.exception.AuthenticationFailedException;
 import com.omar.demoapi.exception.UserNotFoundException;
 import com.omar.demoapi.mapper.UserMapper;
 import com.omar.demoapi.repository.UserRepository;
+import com.omar.demoapi.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +19,19 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     // Constructor Injection
-    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
+    public UserService(
+            UserRepository userRepository,
+            UserMapper userMapper,
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService
+    ) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
 
@@ -108,6 +116,7 @@ public class UserService {
         }
 
         // Authentication successful
-        return new LoginResponse(user.getEmail());
+        String token = jwtService.generateToken(user.getEmail());
+        return new LoginResponse(user.getEmail(), token);
     }
 }
