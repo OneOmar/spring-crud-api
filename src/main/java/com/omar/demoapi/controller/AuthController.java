@@ -1,6 +1,7 @@
 package com.omar.demoapi.controller;
 
 import com.omar.demoapi.dto.LoginRequest;
+import com.omar.demoapi.dto.LoginResponse;
 import com.omar.demoapi.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +21,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@Valid @RequestBody LoginRequest request) {
-        userService.login(request);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        LoginResponse response = userService.login(request);
+        return ResponseEntity.ok(response);
     }
 }

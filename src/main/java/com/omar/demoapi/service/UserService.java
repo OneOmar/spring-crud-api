@@ -1,9 +1,6 @@
 package com.omar.demoapi.service;
 
-import com.omar.demoapi.dto.LoginRequest;
-import com.omar.demoapi.dto.UserPatchRequest;
-import com.omar.demoapi.dto.UserRequest;
-import com.omar.demoapi.dto.UserResponse;
+import com.omar.demoapi.dto.*;
 import com.omar.demoapi.entity.User;
 import com.omar.demoapi.exception.AuthenticationFailedException;
 import com.omar.demoapi.exception.UserNotFoundException;
@@ -97,7 +94,7 @@ public class UserService {
     }
 
     // Authentication method
-    public void login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(AuthenticationFailedException::new);
 
@@ -111,5 +108,6 @@ public class UserService {
         }
 
         // Authentication successful
+        return new LoginResponse(user.getEmail());
     }
 }
