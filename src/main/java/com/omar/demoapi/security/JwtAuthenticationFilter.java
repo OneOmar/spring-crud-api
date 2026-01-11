@@ -43,6 +43,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        // Extract user details
+        String email = jwtService.extractSubject(token);
+
+        // Store user details in request
+        request.setAttribute("authenticatedUserEmail", email);
+
         // Proceed with the filter chain
         filterChain.doFilter(request, response);
     }
