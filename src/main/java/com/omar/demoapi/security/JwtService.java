@@ -1,5 +1,6 @@
 package com.omar.demoapi.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +23,7 @@ public class JwtService {
         this.jwtExpirationInMs = jwtExpirationInMs;
     }
 
+    // Generate token
     public String generateToken(String subject) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
@@ -33,4 +35,30 @@ public class JwtService {
                 .signWith(key)
                 .compact();
     }
+
+    // Validate token
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // Extract subject from token
+    public String extractSubject(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getSubject();
+    }
+
 }
