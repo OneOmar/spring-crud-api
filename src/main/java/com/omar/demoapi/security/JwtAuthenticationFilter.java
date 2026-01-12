@@ -1,5 +1,7 @@
 package com.omar.demoapi.security;
 
+import com.omar.demoapi.entity.User;
+import com.omar.demoapi.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,9 +17,11 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final UserRepository userRepository;
 
-    public JwtAuthenticationFilter(JwtService jwtService) {
+    public JwtAuthenticationFilter(JwtService jwtService, UserRepository userRepository) {
         this.jwtService = jwtService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -48,8 +52,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Extract identity (email) from token
         String email = jwtService.extractSubject(token);
 
-        // Create UserPrincipal
-        UserPrincipal userPrincipal = new UserPrincipal(email);
+        // Load user from database
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Create UserPrincipal with role
+        UserPrincipal userPrincipal = new UserPrincipal(
+                user.getEmail(),
+                user.getRole()
+        );
 
         // Create Authentication object
         UsernamePasswordAuthenticationToken authenticationToken =

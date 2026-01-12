@@ -1,17 +1,29 @@
 package com.omar.demoapi.security;
 
+import com.omar.demoapi.entity.Role;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 public class UserPrincipal implements UserDetails {
 
     private final String email;
+    private final Role role;
 
-    public UserPrincipal(String email) {
+    public UserPrincipal(String email, Role role) {
         this.email = email;
+        this.role = role;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public Role getRole() {
+        return role;
     }
 
     // Identity (username is email)
@@ -29,7 +41,9 @@ public class UserPrincipal implements UserDetails {
     // Roles and authorities
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        return List.of(
+                new SimpleGrantedAuthority("ROLE_" + role.name())
+        );
     }
 
     // Account status flags (keep true)
@@ -53,7 +67,4 @@ public class UserPrincipal implements UserDetails {
         return true;
     }
 
-    public String getEmail() {
-        return email;
-    }
 }
