@@ -4,6 +4,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -43,11 +45,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Extract user details
+        // Extract identity (email) from token
         String email = jwtService.extractSubject(token);
 
-        // Store user details in request
-        request.setAttribute("authenticatedUserEmail", email);
+        // Create UserPrincipal
+        UserPrincipal userPrincipal = new UserPrincipal(email);
+
+        // Create Authentication object
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(
+                        userPrincipal,
+                        null,
+                        userPrincipal.getAuthorities()
+                );
+
+        // Set authentication in security context
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         // Proceed with the filter chain
         filterChain.doFilter(request, response);
@@ -57,7 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
         // Skip filtering for authentication endpoints
-        return path.startsWith("/api/auth/");
+        return path.equals("/api/auth/login");
     }
 
     // Helper method to write unauthorized response as JSON
