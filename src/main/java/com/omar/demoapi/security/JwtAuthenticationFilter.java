@@ -1,9 +1,13 @@
 package com.omar.demoapi.security;
 
+import com.omar.demoapi.entity.User;
+import com.omar.demoapi.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -13,9 +17,11 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final UserRepository userRepository;
 
-    public JwtAuthenticationFilter(JwtService jwtService) {
+    public JwtAuthenticationFilter(JwtService jwtService, UserRepository userRepository) {
         this.jwtService = jwtService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -43,11 +49,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Extract user details
+        // Extract identity (email) from token
         String email = jwtService.extractSubject(token);
 
-        // Store user details in request
-        request.setAttribute("authenticatedUserEmail", email);
+        // Load user from database
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Create UserPrincipal with role
+        UserPrincipal userPrincipal = new UserPrincipal(
+                user.getEmail(),
+                user.getRole()
+        );
+
+        // Create Authentication object
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(
+                        userPrincipal,
+                        null,
+                        userPrincipal.getAuthorities()
+                );
+
+        // Set authentication in security context
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         // Proceed with the filter chain
         filterChain.doFilter(request, response);
@@ -57,7 +81,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
         // Skip filtering for authentication endpoints
-        return path.startsWith("/api/auth/");
+        return path.equals("/api/auth/login");
     }
 
     // Helper method to write unauthorized response as JSON

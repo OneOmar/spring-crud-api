@@ -7,6 +7,7 @@ import com.omar.demoapi.exception.UserNotFoundException;
 import com.omar.demoapi.mapper.UserMapper;
 import com.omar.demoapi.repository.UserRepository;
 import com.omar.demoapi.security.JwtService;
+import com.omar.demoapi.entity.Role;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +55,7 @@ public class UserService {
 
         String hashedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(hashedPassword);
+        user.setRole(Role.USER);
 
         User savedUser = userRepository.save(user);
         return userMapper.toResponse(savedUser);
